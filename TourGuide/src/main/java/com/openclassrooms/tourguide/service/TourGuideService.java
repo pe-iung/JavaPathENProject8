@@ -99,16 +99,44 @@ public class TourGuideService {
 		return visitedLocation;
 	}
 
-	public List<Attraction> getNearByAttractions(VisitedLocation visitedLocation) {
-		List<Attraction> nearbyAttractions = new ArrayList<>();
-		for (Attraction attraction : gpsUtil.getAttractions()) {
-			if (rewardsService.isWithinAttractionProximity(attraction, visitedLocation.location)) {
-				nearbyAttractions.add(attraction);
-			}
-		}
+//	public List<Attraction> getNearByAttractions(VisitedLocation visitedLocation) {
+//		List<Attraction> nearbyAttractions = new ArrayList<>();
+//		for (Attraction attraction : gpsUtil.getAttractions()) {
+//			if (rewardsService.isWithinAttractionProximity(attraction, visitedLocation.location)) {
+//				nearbyAttractions.add(attraction);
+//			}
+//		}
+//
+//		return nearbyAttractions;
+//	}
 
-		return nearbyAttractions;
+	public List<Map<String, Object>> getNearByAttractions(User user) {
+		VisitedLocation visitedLocation = getUserLocation(user);
+		List<Attraction> attractions = gpsUtil.getAttractions();
+
+		return attractions.stream()
+				.map(attraction -> {
+					Map<String, Object> attractionDetails = new HashMap<>();
+					double distance = rewardsService.getDistance(attraction, visitedLocation.location);
+					attractionDetails.put("attractionName", attraction.attractionName);
+					attractionDetails.put("attractionLocation", Map.of(
+							"lat", attraction.latitude,
+							"lon", attraction.longitude
+					));
+					attractionDetails.put("userLocation", Map.of(
+							"lat", visitedLocation.location.latitude,
+							"lon", visitedLocation.location.longitude
+					));
+					attractionDetails.put("distance", distance);
+					attractionDetails.put("rewardPoints", rewardsService.getRewardPoints(attraction, user));
+					return Map.entry(distance, attractionDetails);
+				})
+				.sorted(Map.Entry.comparingByKey())
+				.limit(5)
+				.map(Map.Entry::getValue)
+				.collect(Collectors.toList());
 	}
+
 
 	private void addShutDownHook() {
 		Runtime.getRuntime().addShutdownHook(new Thread() {

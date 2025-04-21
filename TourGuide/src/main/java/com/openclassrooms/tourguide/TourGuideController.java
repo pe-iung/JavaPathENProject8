@@ -1,6 +1,7 @@
 package com.openclassrooms.tourguide;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,10 +42,16 @@ public class TourGuideController {
         // The distance in miles between the user's location and each of the attractions.
         // The reward points for visiting each Attraction.
         //    Note: Attraction reward points can be gathered from RewardsCentral
-    @RequestMapping("/getNearbyAttractions") 
-    public List<Attraction> getNearbyAttractions(@RequestParam String userName) {
-    	VisitedLocation visitedLocation = tourGuideService.getUserLocation(getUser(userName));
-    	return tourGuideService.getNearByAttractions(visitedLocation);
+//    @RequestMapping("/getNearbyAttractions")
+//    public List<Attraction> getNearbyAttractions(@RequestParam String userName) {
+//    	VisitedLocation visitedLocation = tourGuideService.getUserLocation(getUser(userName));
+//    	return tourGuideService.getNearByAttractions(visitedLocation);
+//    }
+
+    @RequestMapping("/getNearbyAttractions")
+    public List<Map<String, Object>> getNearbyAttractions(@RequestParam String userName) {
+        User user = getUser(userName);
+        return tourGuideService.getNearByAttractions(user);
     }
     
     @RequestMapping("/getRewards") 
