@@ -15,7 +15,10 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -33,6 +36,11 @@ import tripPricer.TripPricer;
 
 @Service
 public class TourGuideService {
+
+	private final ExecutorService executorService = Executors.newFixedThreadPool(
+			Runtime.getRuntime().availableProcessors()
+	);
+
 	private Logger logger = LoggerFactory.getLogger(TourGuideService.class);
 	private final GpsUtil gpsUtil;
 	private final RewardsService rewardsService;
@@ -42,6 +50,22 @@ public class TourGuideService {
 
 	// Use CopyOnWriteArrayList for thread-safe operations
 	private final List<User> users = new CopyOnWriteArrayList<>();
+
+	public CompletableFuture<VisitedLocation> trackUserLocationAsync(User user) {
+		return CompletableFuture.supplyAsync(() -> {
+			VisitedLocation visitedLocation = gpsUtil.getUserLocation(user.getUserId());
+			user.addToVisitedLocations(visitedLocation);
+			return visitedLocation;
+		}, executorService);
+	}
+
+	public void trackAllUsers(List<User> users) {
+		List<CompletableFuture<VisitedLocation>> futures = users.stream()
+				.map(this::trackUserLocationAsync)
+				.collect(Collectors.toList());
+
+		CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+	}
 
 	public TourGuideService(GpsUtil gpsUtil, RewardsService rewardsService) {
 		this.gpsUtil = gpsUtil;
