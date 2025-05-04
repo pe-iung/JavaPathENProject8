@@ -19,6 +19,7 @@ import java.util.concurrent.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -30,15 +31,17 @@ import gpsUtil.location.VisitedLocation;
 
 import tripPricer.Provider;
 import tripPricer.TripPricer;
+import org.slf4j.Logger;
 
+@Slf4j
 @Service
 public class TourGuideService {
 
-//	private final ExecutorService executorService = Executors.newFixedThreadPool(
-//			Runtime.getRuntime().availableProcessors()
-//	);
+	private final ExecutorService executor = Executors.newFixedThreadPool(
+			Runtime.getRuntime().availableProcessors()
+	);
 
-	private static final ExecutorService executor = Executors.newFixedThreadPool(100);
+	//private static final ExecutorService executor = Executors.newScheduledThreadPool(100);
 
 	private Logger logger = LoggerFactory.getLogger(TourGuideService.class);
 	private final GpsUtil gpsUtil;
@@ -128,9 +131,12 @@ public class TourGuideService {
 //	   CompletableFuture<VisitedLocation> v = CompletableFuture.supplyAsync(() -> calculateRewards(user), executorService);
 //       return v.join();
 //    }
+
+
 public CompletableFuture<VisitedLocation> trackUserLocation(User user) {
 	return CompletableFuture.supplyAsync(() -> {
 		VisitedLocation visitedLocation = gpsUtil.getUserLocation(user.getUserId());
+		log.info("logging userId:" + user.getUserId() );
 		user.addToVisitedLocations(visitedLocation);
 		return visitedLocation;
 	}, executor);

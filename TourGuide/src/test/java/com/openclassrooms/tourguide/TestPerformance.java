@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.StopWatch;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -20,6 +21,7 @@ import com.openclassrooms.tourguide.service.RewardsService;
 import com.openclassrooms.tourguide.service.TourGuideService;
 import com.openclassrooms.tourguide.user.User;
 
+@Slf4j
 public class TestPerformance {
 
 	/*
@@ -45,7 +47,7 @@ public class TestPerformance {
 	 * TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime()));
 	 */
 
-	@Disabled
+	//@Disabled
 	@Test
 	public void highVolumeTrackLocation() {
 		GpsUtil gpsUtil = new GpsUtil();
@@ -53,6 +55,7 @@ public class TestPerformance {
 		// Users should be incremented up to 100,000, and test finishes within 15
 		// minutes
 		InternalTestHelper.setInternalUserNumber(100000);
+		log.info("internal user = " + InternalTestHelper.getInternalUserNumber());
 		TourGuideService tourGuideService = new TourGuideService(gpsUtil, rewardsService);
 
 		List<User> allUsers = new ArrayList<>();
@@ -62,6 +65,7 @@ public class TestPerformance {
 		stopWatch.start();
 		for (User user : allUsers) {
 			tourGuideService.trackUserLocation(user);
+			log.info("user loop : "+ user.getUserName());
 		}
 		stopWatch.stop();
 		tourGuideService.tracker.stopTracking();
