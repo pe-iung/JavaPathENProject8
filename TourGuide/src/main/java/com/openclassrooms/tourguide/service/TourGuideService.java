@@ -37,10 +37,6 @@ import org.slf4j.Logger;
 @Service
 public class TourGuideService {
 
-	//private final ExecutorService executor = Executors.newFixedThreadPool(
-//			Runtime.getRuntime().availableProcessors()
-//	);
-
 	private static final ExecutorService executor = Executors.newScheduledThreadPool(100);
 
 	private Logger logger = LoggerFactory.getLogger(TourGuideService.class);
@@ -60,7 +56,6 @@ public class TourGuideService {
 			return visitedLocation;
 		}, executor);
 	}
-
 
 
 	public void trackUsersLocation(List<User> users) {
@@ -119,11 +114,6 @@ public class TourGuideService {
 		return providers;
 	}
 
-//	public VisitedLocation trackUserLocation(User user) {
-//	   CompletableFuture<VisitedLocation> v = CompletableFuture.supplyAsync(() -> calculateRewards(user), executorService);
-//       return v.join();
-//    }
-
 
 public CompletableFuture<VisitedLocation> trackUserLocation(User user) {
 	return CompletableFuture.supplyAsync(() -> {
@@ -141,16 +131,6 @@ public CompletableFuture<VisitedLocation> trackUserLocation(User user) {
 		return visitedLocation;
 	}
 
-//	public List<Attraction> getNearByAttractions(VisitedLocation visitedLocation) {
-//		List<Attraction> nearbyAttractions = new ArrayList<>();
-//		for (Attraction attraction : gpsUtil.getAttractions()) {
-//			if (rewardsService.isWithinAttractionProximity(attraction, visitedLocation.location)) {
-//				nearbyAttractions.add(attraction);
-//			}
-//		}
-//
-//		return nearbyAttractions;
-//	}
 
 	public List<Map<String, Object>> getNearByAttractions(User user) throws ExecutionException, InterruptedException {
 		VisitedLocation visitedLocation = getUserLocation(user);
