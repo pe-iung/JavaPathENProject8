@@ -49,7 +49,7 @@ public class Tracker extends Thread {
 			stopWatch.start();
 			//users.forEach(u -> tourGuideService.trackUserLocationAsync(u));
 			try {
-				tourGuideService.trackAllUsers(users);
+				tourGuideService.trackUsersLocation(users);
 			} catch (Exception e) {
 				logger.error("Error tracking users: " + e.getMessage());
 			}

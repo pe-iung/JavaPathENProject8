@@ -37,11 +37,11 @@ import org.slf4j.Logger;
 @Service
 public class TourGuideService {
 
-	private final ExecutorService executor = Executors.newFixedThreadPool(
-			Runtime.getRuntime().availableProcessors()
-	);
+	//private final ExecutorService executor = Executors.newFixedThreadPool(
+//			Runtime.getRuntime().availableProcessors()
+//	);
 
-	//private static final ExecutorService executor = Executors.newScheduledThreadPool(100);
+	private static final ExecutorService executor = Executors.newScheduledThreadPool(100);
 
 	private Logger logger = LoggerFactory.getLogger(TourGuideService.class);
 	private final GpsUtil gpsUtil;
@@ -61,19 +61,12 @@ public class TourGuideService {
 		}, executor);
 	}
 
-//	public CompletableFuture<VisitedLocation> trackUserLocation(User user) {
-//		return CompletableFuture.supplyAsync(() -> {
-//			VisitedLocation visitedLocation = gpsUtil.getUserLocation(user.getUserId());
-//			user.addToVisitedLocations(visitedLocation);
-//			rewardsService.calculateRewards(user);
-//			return visitedLocation;
-//		}, executor);
-//	}
 
-	public void trackAllUsers(List<User> users) {
+
+	public void trackUsersLocation(List<User> users) {
 		List<CompletableFuture<VisitedLocation>> futures = users.stream()
 				.map(this::trackUserLocationAsync)
-				.collect(Collectors.toList());
+				.toList();
 
 		CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
 	}
@@ -99,9 +92,8 @@ public class TourGuideService {
 	}
 
 	public VisitedLocation getUserLocation(User user) throws ExecutionException, InterruptedException {
-		VisitedLocation visitedLocation = (user.getVisitedLocations().size() > 0) ? user.getLastVisitedLocation()
+        return (!user.getVisitedLocations().isEmpty()) ? user.getLastVisitedLocation()
 				: trackUserLocation(user).get();
-		return visitedLocation;
 	}
 
 	public User getUser(String userName) {
