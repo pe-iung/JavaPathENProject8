@@ -20,7 +20,7 @@
 		<repository>
 			<id>project-libs</id>
 			<name>Project Libs Directory</name>
-			<url>file://${project.basedir}/libs</url>
+			<url>file://libs</url>
 		</repository>
 	</repositories>
 	<dependencies>
@@ -59,7 +59,7 @@
 			<artifactId>gpsUtil</artifactId>
 			<version>1.0.0</version>
 			<scope>system</scope>
-			<systemPath>${project.basedir}/libs/gpsUtil.jar</systemPath>
+			<systemPath>libs/gpsUtil.jar</systemPath>
 		</dependency>
 
 		<dependency>
@@ -67,7 +67,7 @@
 			<artifactId>tripPricer</artifactId>
 			<version>1.0.0</version>
 			<scope>system</scope>
-			<systemPath>${project.basedir}/libs/tripPricer.jar</systemPath>
+			<systemPath>libs/tripPricer.jar</systemPath>
 		</dependency>
 
 		<dependency>
@@ -75,7 +75,7 @@
 			<artifactId>rewardCentral</artifactId>
 			<version>1.0.0</version>
 			<scope>system</scope>
-			<systemPath>${project.basedir}/libs/rewardCentral.jar</systemPath>
+			<systemPath>libs/rewardCentral.jar</systemPath>
 		</dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
