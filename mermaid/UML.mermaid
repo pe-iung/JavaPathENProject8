@@ -1,0 +1,142 @@
+classDiagram
+    class TourGuideController {
+        -TourGuideService tourGuideService
+        +index() String
+        +getLocation(String userName) VisitedLocation
+        +getNearbyAttractions(String userName) List~Map~
+        +getRewards(String userName) List~UserReward~
+        +getTripDeals(String userName) List~Provider~
+        -getUser(String userName) User
+    }
+
+    class TourGuideService {
+        -Logger logger
+        -GpsUtil gpsUtil
+        -RewardsService rewardsService
+        -TripPricer tripPricer
+        -Tracker tracker
+        -ExecutorService executor
+        -List~User~ users
+        -Map~String,User~ internalUserMap
+        +getUserRewards(User) List~UserReward~
+        +getUserLocation(User) VisitedLocation
+        +getUser(String) User
+        +getAllUsers() List~User~
+        +addUser(User) void
+        +getTripDeals(User) List~Provider~
+        +trackUserLocation(User) CompletableFuture~VisitedLocation~
+        +trackUsersLocation(List~User~) void
+        +getNearByAttractions(User) List~Map~
+    }
+
+    class RewardsService {
+        -GpsUtil gpsUtil
+        -RewardCentral rewardsCentral
+        -ExecutorService executor
+        -int proximityBuffer
+        -int attractionProximityRange
+        +calculateRewards(User) void
+        +calculateRewardsForAllUsers(List~User~) void
+        +isWithinAttractionProximity(Attraction, Location) boolean
+        +getDistance(Location, Location) double
+        +getRewardPoints(Attraction, User) int
+    }
+
+    class User {
+        -UUID userId
+        -String userName
+        -String phoneNumber
+        -String emailAddress
+        -List~VisitedLocation~ visitedLocations
+        -List~UserReward~ userRewards
+        -UserPreferences userPreferences
+        -List~Provider~ tripDeals
+        +addToVisitedLocations(VisitedLocation) void
+        +addUserReward(UserReward) void
+        +getLastVisitedLocation() VisitedLocation
+    }
+
+    class UserReward {
+        +VisitedLocation visitedLocation
+        +Attraction attraction
+        -int rewardPoints
+        +setRewardPoints(int) void
+        +getRewardPoints() int
+    }
+
+    class UserPreferences {
+        -int attractionProximity
+        -int tripDuration
+        -int ticketQuantity
+        -int numberOfAdults
+        -int numberOfChildren
+        +getAttractionProximity() int
+        +setAttractionProximity(int) void
+        +getTripDuration() int
+        +setTripDuration(int) void
+    }
+
+    class Tracker {
+        -Logger logger
+        -TourGuideService tourGuideService
+        -boolean stop
+        +stopTracking() void
+        +run() void
+    }
+
+    class Location {
+        +double longitude
+        +double latitude
+    }
+
+    class VisitedLocation {
+        +UUID userId
+        +Location location
+        +Date timeVisited
+    }
+
+    class Attraction {
+        +String attractionName
+        +String city
+        +String state
+        +UUID attractionId
+        +double longitude
+        +double latitude
+    }
+
+    class Provider {
+        +String name
+        +double price
+        +UUID tripId
+    }
+
+%% External Services
+    class GpsUtil {
+        +getUserLocation(UUID) VisitedLocation
+        +getAttractions() List~Attraction~
+    }
+
+    class RewardCentral {
+        +getAttractionRewardPoints(UUID, UUID) int
+    }
+
+    class TripPricer {
+        +getPrice(String, UUID, int, int, int, int) List~Provider~
+    }
+
+%% Relationships
+    TourGuideController --> TourGuideService : uses
+    TourGuideService --> RewardsService : uses
+    TourGuideService --> GpsUtil : uses
+    TourGuideService --> TripPricer : uses
+    TourGuideService --> Tracker : creates
+    RewardsService --> GpsUtil : uses
+    RewardsService --> RewardCentral : uses
+    User --> UserPreferences : has
+    User --> UserReward : has many
+    User --> VisitedLocation : has many
+    User --> Provider : has many
+    UserReward --> VisitedLocation : has
+    UserReward --> Attraction : references
+    VisitedLocation --> Location : has
+    Tracker --> TourGuideService : uses
